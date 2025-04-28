@@ -1,0 +1,67 @@
+let worldData, covidData;
+let allDates = [];
+let currentIndicator = "cases";
+
+const dateSlider = d3.select("#dateSlider");
+const currentDateText = d3.select("#currentDate");
+
+const toggleButton = d3.select("#toggleButton");
+const casesOption = d3.select("#casesOption");
+const deathsOption = d3.select("#deathsOption");
+
+Promise.all([
+  d3.json(
+    "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"
+  ),
+  d3.csv("files/covid_data.csv"),
+])
+  .then(([world, covid]) => {
+    worldData = world;
+    covidData = covid;
+
+    const dateSet = new Set();
+    covidData.forEach((d) => {
+      if (d.year_week) {
+        const date = weekYearToDate(d.year_week);
+        if (date.getFullYear() >= 2020) {
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = date.getFullYear();
+          dateSet.add(`${year}-${month}`);
+        }
+      }
+    });
+
+    allDates = Array.from(dateSet).sort();
+    dateSlider.attr("max", allDates.length - 1).on("input", function () {
+      const index = +this.value;
+      const selectedDate = allDates[index];
+      currentDateText.text(formatDateDisplay(selectedDate));
+      updateMap(selectedDate);
+    });
+
+    updateMap();
+    currentDateText.text("Todos os dados");
+  })
+  .catch((error) => {
+    console.error("Erro ao carregar dados:", error);
+  });
+
+toggleButton.on("click", function () {
+  currentIndicator = currentIndicator === "cases" ? "deaths" : "cases";
+
+  casesOption.classed("active", currentIndicator === "cases");
+  deathsOption.classed("active", currentIndicator === "deaths");
+
+  const index = +dateSlider.node().value;
+  const selectedDate = allDates[index];
+  currentDateText.text(
+    selectedDate ? formatDateDisplay(selectedDate) : "Todos os dados"
+  );
+  updateMap(selectedDate);
+});
+
+d3.select("#resetButton").on("click", function () {
+  dateSlider.node().value = 0;
+  currentDateText.text("Todos os dados");
+  updateMap();
+});

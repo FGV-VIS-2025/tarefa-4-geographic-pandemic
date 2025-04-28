@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mapa Interativo COVID-19 - Toggle Casos/Mortes</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <h1>Mapa Interativo de Casos e Mortes COVID-19</h1>
+    </header>
+
+    <!-- Controles -->
+    <div id="controls">
+      <div class="toggle-container" id="toggleButton">
+        <div class="toggle-option active" id="casesOption">🦠 Casos</div>
+        <div class="toggle-option" id="deathsOption">⚰️ Mortes</div>
+      </div>
+    </div>
+
+    <div id="timeline">
+      <input type="range" id="dateSlider" min="0" max="0" value="0" />
+      <div id="currentDate">Todos os dados</div>
+      <button class="button" id="resetButton">Ver Todos os Dados</button>
+    </div>
+
+    <svg id="map" width="960" height="600"></svg>
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        Fonte:
+        <a
+          href="https://www.kaggle.com/datasets/cristiangarrido/covid19geographicdistributionworldwide?resource=download"
+          target="_blank"
+          >Kaggle, Epidemic Intelligence, National Weekly Data</a
+        >
+      </p>
+      <p>
+        Desenvolvido como projeto de visualização de dados sobre a pandemia
+        COVID-19.
+      </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="utils.js"></script>
+    <script src="map.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
