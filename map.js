@@ -1,6 +1,7 @@
 const width = 960;
 const height = 600;
 const svg = d3.select("#map").attr("width", width).attr("height", height);
+const g = svg.append("g");
 const tooltip = d3.select("#tooltip");
 
 const projection = d3
@@ -43,7 +44,7 @@ function updateMap(selectedDate = null) {
   const maxCount = d3.max(Object.values(covidByCountry)) || 10000;
   colorScale.domain([1, maxCount]);
 
-  const countries = svg.selectAll("path").data(worldData.features, (d) => d.id);
+  const countries = g.selectAll("path").data(worldData.features, (d) => d.id);
 
   countries
     .enter()
@@ -173,3 +174,12 @@ function drawCountryChart(countryCode, clickX, clickY) {
         .y((d) => y(d.value))
     );
 }
+
+svg.call(
+  d3
+    .zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", (event) => {
+      g.attr("transform", event.transform);
+    })
+);

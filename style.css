@@ -223,3 +223,12 @@ footer {
 .hidden {
   display: none;
 }
+
+#zoomHint {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  font-style: italic;
+}
