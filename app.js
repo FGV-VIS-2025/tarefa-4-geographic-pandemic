@@ -2,6 +2,8 @@ let worldData, covidData;
 let allDates = [];
 let currentIndicator = "cases";
 let isShowingAll = true;
+const playButton = d3.select("#playButton");
+let animationInterval = null;
 
 const dateSlider = d3.select("#dateSlider");
 const currentDateText = d3.select("#currentDate");
@@ -155,4 +157,34 @@ countrySearch.on("input", function () {
   } else {
     searchResults.classed("hidden", true);
   }
+});
+
+playButton.on("click", function () {
+  if (animationInterval) {
+    clearInterval(animationInterval);
+    animationInterval = null;
+    playButton.text("▶️ Reproduzir Evolução");
+    return;
+  }
+
+  playButton.text("⏸️ Pausar");
+
+  animationInterval = setInterval(() => {
+    let index = +dateSlider.node().value;
+    index++;
+
+    if (index >= allDates.length) {
+      clearInterval(animationInterval);
+      animationInterval = null;
+      playButton.text("▶️ Reproduzir Evolução");
+      return;
+    }
+
+    dateSlider.node().value = index;
+    const selectedDate = allDates[index];
+    currentDateText.text(formatDateDisplay(selectedDate));
+    isShowingAll = false;
+    resetButton.text("Ver Todos os Dados");
+    updateMap(selectedDate);
+  }, 1000);
 });
