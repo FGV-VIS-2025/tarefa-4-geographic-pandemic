@@ -32,12 +32,15 @@ Promise.all([
     });
 
     allDates = Array.from(dateSet).sort();
+
     dateSlider.attr("max", allDates.length - 1).on("input", function () {
       const index = +this.value;
       const selectedDate = allDates[index];
       currentDateText.text(formatDateDisplay(selectedDate));
       updateMap(selectedDate);
     });
+
+    renderMonthLabels(); // ✅ Chamada da função para exibir rótulos de meses
 
     updateMap();
     currentDateText.text("Todos os dados");
@@ -65,3 +68,19 @@ d3.select("#resetButton").on("click", function () {
   currentDateText.text("Todos os dados");
   updateMap();
 });
+
+function renderMonthLabels() {
+  const container = d3.select("#monthLabels");
+  container.html("");
+
+  allDates.forEach((dateStr, i) => {
+    const [year, month] = dateStr.split("-");
+    const label = document.createElement("span");
+    const date = new Date(`${dateStr}-01`);
+    label.textContent = date.toLocaleString("default", { month: "short" });
+    label.title = `${month}/${year}`;
+    label.className = "month-label";
+    label.style.left = `${(i / (allDates.length - 1)) * 100}%`;
+    container.node().appendChild(label);
+  });
+}
