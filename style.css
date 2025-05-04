@@ -97,3 +97,29 @@ footer {
   border-radius: 4px;
   opacity: 0;
 }
+
+#legend {
+  width: 220px;
+  margin: 10px auto 30px;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+.legend-title {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.legend-scale {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.legend-labels {
+  width: 200px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}

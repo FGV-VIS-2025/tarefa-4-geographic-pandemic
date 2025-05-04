@@ -11,6 +11,12 @@ const path = d3.geoPath().projection(projection);
 
 const colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([1, 10000]);
 
+function formatK(value) {
+  return value >= 1000
+    ? (value / 1000).toFixed(1).replace(/\.0$/, "") + "k"
+    : value;
+}
+
 function updateMap(selectedDate = null) {
   const covidByCountry = {};
 
@@ -76,4 +82,17 @@ function updateMap(selectedDate = null) {
     });
 
   countries.exit().remove();
+
+  const legendLabels = d3.select(".legend-labels");
+  if (!legendLabels.empty()) {
+    const min = 0;
+    const max = Math.round(maxCount);
+    legendLabels.selectAll("span").remove();
+    legendLabels
+      .selectAll("span")
+      .data([min, Math.round(max / 2), max])
+      .enter()
+      .append("span")
+      .text((d) => formatK(d));
+  }
 }
