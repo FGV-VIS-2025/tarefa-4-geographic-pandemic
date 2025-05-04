@@ -13,6 +13,18 @@ const deathsOption = d3.select("#deathsOption");
 
 const resetButton = d3.select("#resetButton");
 
+const countrySearch = d3.select("#countrySearch");
+const searchResults = d3.select("#searchResults");
+
+let countryNameByCode = {};
+
+function buildSearchIndex() {
+  countryNameByCode = {};
+  worldData.features.forEach((feature) => {
+    countryNameByCode[feature.properties.name] = feature.id;
+  });
+}
+
 Promise.all([
   d3.json(
     "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"
@@ -23,6 +35,8 @@ Promise.all([
     worldData = world;
     covidData = covid;
 
+    buildSearchIndex();
+
     const dateSet = new Set();
     covidData.forEach((d) => {
       if (d.year_week) {
@@ -32,11 +46,8 @@ Promise.all([
         dateSet.add(`${year}-${month}`);
       }
     });
-    console.log(covidData);
-    console.log(dateSet);
 
     allDates = Array.from(dateSet).sort();
-    console.log(allDates);
 
     dateSlider.attr("max", allDates.length - 1).on("input", function () {
       const index = +this.value;
@@ -48,8 +59,7 @@ Promise.all([
     });
 
     renderMonthLabels();
-
-    updateMap(); // mostra todos os dados inicialmente
+    updateMap();
     currentDateText.text("Todos os dados");
     currentIndicatorLabel.text("Visualizando: Casos");
     resetButton.text("Ver Dados de um Mês");
@@ -102,13 +112,11 @@ d3.select("#closeChart").on("click", function () {
 function renderMonthLabels() {
   const container = d3.select("#monthLabels");
   container.html("");
-  console.log(allDates);
 
   allDates.forEach((dateStr, i) => {
     const [year, month] = dateStr.split("-");
     const label = document.createElement("span");
     const date = new Date(`${dateStr}-02`);
-    console.log(date);
     label.textContent = date.toLocaleString("default", { month: "short" });
     label.title = `${month}/${year}`;
     label.className = "month-label";
@@ -116,3 +124,35 @@ function renderMonthLabels() {
     container.node().appendChild(label);
   });
 }
+
+countrySearch.on("input", function () {
+  const term = this.value.toLowerCase();
+  const matches = Object.keys(countryNameByCode)
+    .filter((name) => name.toLowerCase().includes(term))
+    .sort();
+
+  searchResults.html("");
+  if (term && matches.length > 0) {
+    searchResults.classed("hidden", false);
+    matches.forEach((name) => {
+      const li = searchResults.append("li").text(name);
+      li.on("click", () => {
+        const code = countryNameByCode[name];
+        searchResults.classed("hidden", true);
+        countrySearch.property("value", name);
+
+        const country = worldData.features.find((d) => d.id === code);
+        if (country) {
+          const bounds = path.bounds(country);
+          const [x, y] = [
+            (bounds[0][0] + bounds[1][0]) / 2,
+            (bounds[0][1] + bounds[1][1]) / 2,
+          ];
+          drawCountryChart(code, x, y);
+        }
+      });
+    });
+  } else {
+    searchResults.classed("hidden", true);
+  }
+});
