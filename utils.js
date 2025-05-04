@@ -1,34 +1,15 @@
-function weekYearToDate(yearWeek) {
-  const [yearStr, weekStr] = yearWeek.split("-");
-  const year = parseInt(yearStr);
-  const week = parseInt(weekStr);
-  const jan4 = new Date(year, 0, 4);
-  const dayOfWeek = jan4.getDay();
-  const ISOweekStart = new Date(jan4);
-  ISOweekStart.setDate(
-    jan4.getDate() - (dayOfWeek <= 4 ? dayOfWeek - 1 : dayOfWeek - 8)
-  );
-  const result = new Date(ISOweekStart);
-  result.setDate(result.getDate() + (week - 1) * 7);
-  return result;
+function weekYearToDate(weekYear) {
+  const [year, week] = weekYear.split("-W").map(Number);
+  const simple = new Date(year, 0, 1 + (week - 1) * 7);
+  const dow = simple.getDay();
+  const ISOweekStart = simple;
+  if (dow <= 4) ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+  else ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+  return ISOweekStart;
 }
 
-function formatDateDisplay(ym) {
-  if (!ym) return "Todos os dados";
-  const [year, month] = ym.split("-");
-  const monthNames = [
-    "Jan",
-    "Fev",
-    "Mar",
-    "Abr",
-    "Mai",
-    "Jun",
-    "Jul",
-    "Ago",
-    "Set",
-    "Out",
-    "Nov",
-    "Dez",
-  ];
-  return `${monthNames[parseInt(month) - 1]} ${year}`;
+function formatDateDisplay(dateStr) {
+  const [year, month] = dateStr.split("-");
+  const date = new Date(parseInt(year), parseInt(month) - 1); // corrigido para mês correto
+  return `${date.toLocaleString("default", { month: "short" })} ${year}`;
 }

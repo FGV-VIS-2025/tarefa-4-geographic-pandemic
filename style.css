@@ -174,3 +174,9 @@ footer {
 .hidden {
   display: none;
 }
+
+#currentIndicatorLabel {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #444;
+}
