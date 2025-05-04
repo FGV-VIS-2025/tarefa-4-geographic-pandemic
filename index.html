@@ -30,32 +30,11 @@
     <svg id="map" width="960" height="600"></svg>
     <div class="tooltip" id="tooltip"></div>
 
-    <!-- Legenda dinâmica -->
-    <div id="legend">
-      <div class="legend-title">Quantidade</div>
-      <div class="legend-scale">
-        <svg height="10" width="200">
-          <defs>
-            <linearGradient id="legendGradient">
-              <stop offset="0%" stop-color="#ffffcc" />
-              <stop offset="50%" stop-color="#fd8d3c" />
-              <stop offset="100%" stop-color="#800026" />
-            </linearGradient>
-          </defs>
-          <rect
-            x="0"
-            y="0"
-            width="200"
-            height="10"
-            fill="url(#legendGradient)"
-          />
-        </svg>
-        <div class="legend-labels">
-          <span>0</span>
-          <span>...</span>
-          <span>máx</span>
-        </div>
-      </div>
+    <!-- Gráfico sobreposto ao mapa -->
+    <div id="countryChartContainer" class="hidden">
+      <button id="closeChart">✖</button>
+      <h2 id="countryChartTitle"></h2>
+      <div id="countryChart"></div>
     </div>
 
     <!-- Footer -->

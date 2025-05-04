@@ -73,6 +73,11 @@ function updateMap(selectedDate = null) {
       tooltip.style("opacity", 0);
       d3.select(this).attr("stroke", "#fff").attr("stroke-width", 0.5);
     })
+    .on("click", function (event, d) {
+      const code = d.id;
+      const [x, y] = d3.pointer(event, svg.node());
+      drawCountryChart(code, x, y);
+    })
     .transition()
     .duration(750)
     .attr("fill", (d) => {
@@ -95,4 +100,76 @@ function updateMap(selectedDate = null) {
       .append("span")
       .text((d) => formatK(d));
   }
+}
+
+function drawCountryChart(countryCode, clickX, clickY) {
+  const filtered = covidData.filter(
+    (d) => d.country_code === countryCode && d.indicator === currentIndicator
+  );
+
+  const data = filtered
+    .filter((d) => d.year_week && !isNaN(+d.weekly_count))
+    .map((d) => ({
+      date: weekYearToDate(d.year_week),
+      value: +d.weekly_count,
+    }))
+    .sort((a, b) => a.date - b.date);
+
+  const container = d3.select("#countryChart");
+  container.html("");
+
+  const chartBox = d3.select("#countryChartContainer");
+  chartBox.classed("hidden", false);
+  chartBox.style("left", `${clickX + 40}px`);
+  chartBox.style("top", `${clickY}px`);
+
+  const title = d3.select("#countryChartTitle");
+  const countryName =
+    worldData.features.find((f) => f.id === countryCode)?.properties.name || "";
+  title.text(
+    `Série temporal de ${
+      currentIndicator === "cases" ? "casos" : "mortes"
+    } – ${countryName}`
+  );
+
+  const margin = { top: 20, right: 20, bottom: 30, left: 50 },
+    width = 360 - margin.left - margin.right,
+    height = 240 - margin.top - margin.bottom;
+
+  const svgChart = container
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3
+    .scaleTime()
+    .domain(d3.extent(data, (d) => d.date))
+    .range([0, width]);
+  const y = d3
+    .scaleLinear()
+    .domain([0, d3.max(data, (d) => d.value)])
+    .nice()
+    .range([height, 0]);
+
+  svgChart
+    .append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x).ticks(4));
+  svgChart.append("g").call(d3.axisLeft(y));
+
+  svgChart
+    .append("path")
+    .datum(data)
+    .attr("fill", "none")
+    .attr("stroke", "#6c9ecf")
+    .attr("stroke-width", 2)
+    .attr(
+      "d",
+      d3
+        .line()
+        .x((d) => x(d.date))
+        .y((d) => y(d.value))
+    );
 }

@@ -84,3 +84,7 @@ function renderMonthLabels() {
     container.node().appendChild(label);
   });
 }
+
+d3.select("#closeChart").on("click", function () {
+  d3.select("#countryChartContainer").classed("hidden", true);
+});
